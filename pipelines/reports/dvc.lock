@@ -1,0 +1,55 @@
+schema: '2.0'
+stages:
+  predict:
+    cmd: python ../../src/stages/predict.py --config=params.yaml
+    deps:
+    - path: ../../data/current.csv
+      md5: a7a83c4bc49a45ad14cf9d4b64b173b7
+      size: 45736
+    - path: ../../data/reference.csv
+      md5: ff6463a6dd33b07bb405b6c272dc4fda
+      size: 38764
+    - path: ../../models/model.pickle
+      md5: 8e15eaf7ab3dfa9202fc5059386797e3
+      size: 2315104
+    - path: ../../src/stages/predict.py
+      md5: bed758ba93a4a7866b491ea93511b54f
+      size: 2288
+    params:
+      params.yaml:
+        base:
+          workdir: ../..
+          logging_level: INFO
+        predict:
+          model_path: models/model.pickle
+    outs:
+    - path: ../../data/current_prediction.csv
+      md5: 7f3aa625f80cfdbcaccfa5ab4b7dcf4c
+      size: 49910
+    - path: ../../data/reference_prediction.csv
+      md5: 417fe5cb6e3c7cdd657ec40ea21df524
+      size: 42328
+  monitoring:
+    cmd: python ../../src/stages/monitoring.py --config=params.yaml
+    deps:
+    - path: ../../data/current_prediction.csv
+      md5: 7f3aa625f80cfdbcaccfa5ab4b7dcf4c
+      size: 49910
+    - path: ../../data/reference_prediction.csv
+      md5: 417fe5cb6e3c7cdd657ec40ea21df524
+      size: 42328
+    - path: ../../src/stages/monitoring.py
+      md5: c367ec2278a3c1f02857e86157569137
+      size: 8346
+    params:
+      params.yaml:
+        base:
+          workdir: ../..
+          logging_level: INFO
+        predict:
+          model_path: models/model.pickle
+    outs:
+    - path: ../../reports/2011-01-29_2011-02-04
+      md5: f6dfa84de54ffcc43cf2649fb8cd8573.dir
+      size: 25459725
+      nfiles: 9

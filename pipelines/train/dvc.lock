@@ -1,0 +1,81 @@
+schema: '2.0'
+stages:
+  extract_data:
+    cmd: python ../../src/stages/extract_data.py --config=params.yaml
+    deps:
+    - path: ../../data/hour.csv
+      md5: 7cc28fc0c06420915e18b954811c342c
+      size: 1156736
+    - path: ../../src/stages/extract_data.py
+      md5: bbc3b18ac66a0c8af06304021366011f
+      size: 1727
+    params:
+      params.yaml:
+        base:
+          workdir: ../..
+          logging_level: INFO
+        data:
+          raw_data: data/hour.csv
+          target_col: cnt
+          prediction_col: prediction
+          numerical_features:
+          - temp
+          - atemp
+          - hum
+          - windspeed
+          - hr
+          - weekday
+          categorical_features:
+          - season
+          - holiday
+          - workingday
+          reference_data: data/reference.csv
+          current_data: data/current.csv
+        extract_data:
+          ref_dates_range: 2011-01-01--2011-01-28
+          cur_dates_range: 2011-01-29--2011-02-28
+    outs:
+    - path: ../../data/current.csv
+      md5: a7a83c4bc49a45ad14cf9d4b64b173b7
+      size: 45736
+    - path: ../../data/reference.csv
+      md5: ff6463a6dd33b07bb405b6c272dc4fda
+      size: 38764
+  train:
+    cmd: python ../../src/stages/train.py --config=params.yaml
+    deps:
+    - path: ../../data/reference.csv
+      md5: ff6463a6dd33b07bb405b6c272dc4fda
+      size: 38764
+    - path: ../../src/stages/train.py
+      md5: 754fb6db899448bfba09b305cbb23038
+      size: 1689
+    params:
+      params.yaml:
+        base:
+          workdir: ../..
+          logging_level: INFO
+        data:
+          raw_data: data/hour.csv
+          target_col: cnt
+          prediction_col: prediction
+          numerical_features:
+          - temp
+          - atemp
+          - hum
+          - windspeed
+          - hr
+          - weekday
+          categorical_features:
+          - season
+          - holiday
+          - workingday
+          reference_data: data/reference.csv
+          current_data: data/current.csv
+        train:
+          n_estimators: 50
+          model_path: models/model.pickle
+    outs:
+    - path: ../../models/model.pickle
+      md5: 8e15eaf7ab3dfa9202fc5059386797e3
+      size: 2315104

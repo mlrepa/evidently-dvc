@@ -1,0 +1,28 @@
+
+stages:
+
+  predict:
+    cmd: python ${base.workdir}/src/stages/predict.py --config=params.yaml
+    params:
+      - base
+      - predict
+    deps:
+      - ${base.workdir}/src/stages/predict.py
+      - ${base.workdir}/${data.reference_data}
+      - ${base.workdir}/${data.current_data}
+      - ${base.workdir}/${predict.model_path}
+    outs:
+      - ${base.workdir}/${data.reference_prediction}
+      - ${base.workdir}/${data.current_prediction}
+
+  monitoring:
+    cmd: python ${base.workdir}/src/stages/monitoring.py --config=params.yaml
+    params:
+      - base
+      - predict
+    deps:
+      - ${base.workdir}/src/stages/monitoring.py
+      - ${base.workdir}/${data.reference_prediction}
+      - ${base.workdir}/${data.current_prediction}
+    outs:
+      - ${base.workdir}/${monitoring.reports_dir}/${monitoring.week_start}_${monitoring.week_end}

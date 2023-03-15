@@ -1,0 +1,27 @@
+
+stages:
+
+  extract_data:
+    cmd: python ${base.workdir}/src/stages/extract_data.py --config=params.yaml
+    params:
+      - base
+      - data
+      - extract_data
+    deps:
+      - ${base.workdir}/src/stages/extract_data.py
+      - ${base.workdir}/${data.raw_data}
+    outs:
+      - ${base.workdir}/${data.reference_data}
+      - ${base.workdir}/${data.current_data}
+
+  train:
+    cmd: python ${base.workdir}/src/stages/train.py --config=params.yaml
+    params:
+      - base
+      - data
+      - train
+    deps:
+      - ${base.workdir}/src/stages/train.py
+      - ${base.workdir}/${data.reference_data}
+    outs:
+      - ${base.workdir}/${train.model_path}
