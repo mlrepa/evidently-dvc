@@ -1,16 +1,13 @@
 import argparse
-from evidently import ColumnMapping
-from evidently.report import Report
-from evidently.metric_preset import (
-    DataDriftPreset,
-    DataQualityPreset,
-)
-from evidently.report import Report
 import logging
-import pandas as pd
 from pathlib import Path
 from typing import Dict, List, Text
+
+import pandas as pd
 import yaml
+from evidently import ColumnMapping
+from evidently.metric_preset import DataDriftPreset, DataQualityPreset
+from evidently.report import Report
 
 
 def monitoring(config_path: Text) -> None:

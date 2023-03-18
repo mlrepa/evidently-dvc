@@ -1,8 +1,9 @@
 import argparse
 import logging
-import pandas as pd
 from pathlib import Path
 from typing import Dict, Text
+
+import pandas as pd
 import yaml
 
 

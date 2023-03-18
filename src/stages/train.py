@@ -1,12 +1,12 @@
 import argparse
-import joblib
 import logging
-import pandas as pd
 from pathlib import Path
-import pickle
-from sklearn import ensemble
 from typing import Dict, List, Text
+
+import joblib
+import pandas as pd
 import yaml
+from sklearn import ensemble
 
 
 def train(config_path: Text) -> None:

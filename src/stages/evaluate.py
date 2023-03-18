@@ -1,13 +1,14 @@
 import argparse
-from evidently import ColumnMapping
-from evidently.report import Report
-from evidently.metric_preset import RegressionPreset
-import joblib
 import logging
-import pandas as pd
 from pathlib import Path
 from typing import Dict, List, Text
+
+import joblib
+import pandas as pd
 import yaml
+from evidently import ColumnMapping
+from evidently.metric_preset import RegressionPreset
+from evidently.report import Report
 
 
 def evaluate(config_path: Text) -> None:
