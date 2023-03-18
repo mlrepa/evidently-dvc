@@ -1,0 +1,48 @@
+schema: '2.0'
+stages:
+  predict:
+    cmd: python ../../src/stages/predict.py --config=params.yaml
+    deps:
+    - path: ../../models/model.joblib
+      md5: 9ce11616eb4020d4f065a590db3b791a
+      size: 2297569
+    - path: ../../src/stages/predict.py
+      md5: 9ae94c37abfc1d47313e14627238dcc1
+      size: 2947
+    params:
+      params.yaml:
+        base:
+          workdir: ../..
+          logging_level: INFO
+        predict:
+          model_path: models/model.joblib
+          week_start: '2011-01-29'
+          week_end: '2011-02-04'
+          predictions_dir: data/predictions
+    outs:
+    - path: ../../data/predictions/2011-01-29--2011-02-04.csv
+      md5: eec57c005ed01e179cf3463ff6443196
+      size: 11253
+  monitoring:
+    cmd: python ../../src/stages/monitor_data.py --config=params.yaml
+    deps:
+    - path: ../../data/predictions/2011-01-29--2011-02-04.csv
+      md5: eec57c005ed01e179cf3463ff6443196
+      size: 11253
+    params:
+      params.yaml:
+        base:
+          workdir: ../..
+          logging_level: INFO
+        predict:
+          model_path: models/model.joblib
+          week_start: '2011-01-29'
+          week_end: '2011-02-04'
+          predictions_dir: data/predictions
+    outs:
+    - path: ../../reports/2011-01-29--2011-02-04/data_drift.html
+      md5: c39e883acd333ea6764ff07ebf0aba3f
+      size: 2867238
+    - path: ../../reports/2011-01-29--2011-02-04/data_quality.html
+      md5: 1974b9e0b85a56851a07fe1678e99888
+      size: 2853412

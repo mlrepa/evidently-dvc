@@ -1,0 +1,13 @@
+
+stages:
+
+  monitoring:
+    cmd: python ${base.workdir}/src/stages/monitor_model.py --config=params.yaml
+    params:
+      - base
+      - predict
+    deps:
+      - ${base.workdir}/${predict.predictions_dir}/${predict.week_start}--${predict.week_end}.csv
+    outs:
+      - ${base.workdir}/${monitoring.reports_dir}/${predict.week_start}--${predict.week_end}/${monitoring.target_drift_path}
+      - ${base.workdir}/${monitoring.reports_dir}/${predict.week_start}--${predict.week_end}/${monitoring.model_performance_path}

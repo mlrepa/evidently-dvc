@@ -1,0 +1,23 @@
+base:
+  workdir: ../..
+  logging_level: INFO
+
+data:
+  predict_data: data/test.csv
+  target_col: cnt
+  prediction_col: prediction
+  numerical_features: ['temp', 'atemp', 'hum', 'windspeed', 'hr', 'weekday']
+  categorical_features: ['season', 'holiday', 'workingday']
+  
+predict: 
+  model_path: models/model.joblib
+  week_start: '2011-01-29'
+  week_end: '2011-02-04'
+  predictions_dir: data/predictions
+
+monitoring:
+  reports_dir: reports
+  reference_data: data/reference_data.csv
+
+  model_performance_path: model_performance.html
+  target_drift_path: target_drift.html

@@ -20,7 +20,6 @@ def extract_data(config_path: Text) -> None:
         level=config['base']['logging_level'],
         format='EXTRACT_DATA: %(message)s'
     )
-
     workdir: Path = Path(config['base']['workdir'])
 
     logging.info('Load raw data')
@@ -34,28 +33,23 @@ def extract_data(config_path: Text) -> None:
     )
 
     logging.info('Extract reference and current data')
-    ref_dates_range: Text = config['extract_data']['ref_dates_range']
-    cur_dates_range: Text = config['extract_data']['cur_dates_range']
-    ref_start_date, ref_end_date = ref_dates_range.split('--')
-    cur_start_date, cur_end_date = cur_dates_range.split('--')
-    reference: pd.DataFrame = raw_data.loc[ref_start_date:ref_end_date]
-    current: pd.DataFrame = raw_data.loc[cur_start_date:cur_end_date]
+    train_dates_range: Text = config['extract_data']['train_dates_range']
+    test_dates_range: Text = config['extract_data']['test_dates_range']
+    
+    TRAIN_START, TRAIN_END = train_dates_range.split('--')
+    TEST_START, TEST_END = test_dates_range.split('--')
+    train_data: pd.DataFrame = raw_data.loc[TRAIN_START:TRAIN_END]
+    test_data: pd.DataFrame = raw_data.loc[TEST_START:TEST_END]
 
-    logging.info('Save reference and current data')
-    reference.to_csv(workdir / config['data']['reference_data'])
-    current.to_csv(workdir / config['data']['current_data'])
+    logging.info('Save train_data and test_data data')
+    train_data.to_csv(workdir / config['data']['train_data'])
+    test_data.to_csv(workdir / config['data']['test_data'])
 
 
 if __name__ == '__main__':
 
     args_parser = argparse.ArgumentParser()
-    args_parser.add_argument(
-        '--config',
-        dest='config',
-        required=True
-    )
+    args_parser.add_argument('--config', dest='config', required=True)
     args = args_parser.parse_args()
 
-    extract_data(
-        config_path=Path(args.config)
-    )
+    extract_data(config_path=Path(args.config))
