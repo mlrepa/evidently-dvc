@@ -17,39 +17,33 @@ def extract_data(config_path: Text) -> None:
         config: Dict = yaml.safe_load(config_f)
 
     logging.basicConfig(
-        level=config['base']['logging_level'],
-        format='EXTRACT_DATA: %(message)s'
+        level=config["base"]["logging_level"], format="EXTRACT_DATA: %(message)s"
     )
-    workdir: Path = Path(config['base']['workdir'])
+    workdir: Path = Path(config["base"]["workdir"])
 
-    logging.info('Load raw data')
-    raw_data_path: Dict = workdir / config['data']['raw_data']
+    logging.info("Load raw data")
+    raw_data_path: Dict = workdir / config["data"]["raw_data"]
     raw_data: pd.DataFrame = pd.read_csv(
-        raw_data_path,
-        header=0,
-        sep=',',
-        parse_dates=['dteday'],
-        index_col='dteday'
+        raw_data_path, header=0, sep=",", parse_dates=["dteday"], index_col="dteday"
     )
 
-    logging.info('Extract reference and current data')
-    train_dates_range: Text = config['extract_data']['train_dates_range']
-    test_dates_range: Text = config['extract_data']['test_dates_range']
-    
-    TRAIN_START, TRAIN_END = train_dates_range.split('--')
-    TEST_START, TEST_END = test_dates_range.split('--')
+    logging.info("Extract reference and current data")
+    train_dates_range: Text = config["extract_data"]["train_dates_range"]
+    test_dates_range: Text = config["extract_data"]["test_dates_range"]
+
+    TRAIN_START, TRAIN_END = train_dates_range.split("--")
+    TEST_START, TEST_END = test_dates_range.split("--")
     train_data: pd.DataFrame = raw_data.loc[TRAIN_START:TRAIN_END]
     test_data: pd.DataFrame = raw_data.loc[TEST_START:TEST_END]
 
-    logging.info('Save train_data and test_data data')
-    train_data.to_csv(workdir / config['data']['train_data'])
-    test_data.to_csv(workdir / config['data']['test_data'])
+    logging.info("Save train_data and test_data data")
+    train_data.to_csv(workdir / config["data"]["train_data"])
+    test_data.to_csv(workdir / config["data"]["test_data"])
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     args_parser = argparse.ArgumentParser()
-    args_parser.add_argument('--config', dest='config', required=True)
+    args_parser.add_argument("--config", dest="config", required=True)
     args = args_parser.parse_args()
 
     extract_data(config_path=Path(args.config))
