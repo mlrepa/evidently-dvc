@@ -18,32 +18,26 @@ jupyter contrib nbextension install --user
 jupyter nbextension enable toc2/main
 ```
 
-## Run pipeline
+## Run pipelines
 
-### Option 1: in Jupyter Notebook
+### `train`
 
-- Launch `Jupyter Notebook`:
+```bash
+dvc repro pipelines/train/dvc.yaml
+```
 
-    ```bash
-    jupyter-notebook
-    ```
-- Open notebook `notebooks/bicycle_demand_monitoring.ipynb`
-- Run pipeline
+### `predict`
 
+```bash
+dvc repro pipelines/predict/dvc.yaml
+```
 
-### Option 2: DVC pipelines
+### `monitor`
 
-- `train`:
+```bash
+dvc repro pipelines/monitor/dvc.yaml
+```
 
-    ```bash
-    dvc repro pipelines/train/dvc.yaml
-    ```
-
-- `reports`:
-
-    ```bash
-    dvc repro pipelines/reports/dvc.yaml
-    ```
 
 ### View reports
 
