@@ -36,6 +36,8 @@ def extract_data(config_path: Text) -> None:
     TEST_START, TEST_END = test_dates_range.split("--")
     train_data: pd.DataFrame = raw_data.loc[TRAIN_START:TRAIN_END]
     test_data: pd.DataFrame = raw_data.loc[TEST_START:TEST_END]
+    
+    print(type(train_data))
 
     logging.info("Save train_data and test_data data")
     train_data.to_csv(workdir / config["data"]["train_data"])
@@ -47,4 +49,4 @@ if __name__ == "__main__":
     args_parser.add_argument("--config", dest="config", required=True)
     args = args_parser.parse_args()
 
-    extract_data(config_path=Path(args.config))
+    extract_data(config_path=args.config)
