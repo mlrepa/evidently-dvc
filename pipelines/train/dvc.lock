@@ -1,5 +1,13 @@
 schema: '2.0'
 stages:
+  load_data:
+    cmd: "echo \"Download Bike Sharing data...\"\nwget https://archive.ics.uci.edu/ml/machine-learning-databases/00275/Bike-Sharing-Dataset.zip\
+      \ -P ../../data/\necho \"Unzip data...\"\nunzip ../../data/Bike-Sharing-Dataset.zip\
+      \ -d ../../data/\n"
+    outs:
+    - path: ../../data/hour.csv
+      md5: 7cc28fc0c06420915e18b954811c342c
+      size: 1156736
   extract_data:
     cmd: python ../../src/stages/extract_data.py --config=params.yaml
     deps:
@@ -7,8 +15,8 @@ stages:
       md5: 7cc28fc0c06420915e18b954811c342c
       size: 1156736
     - path: ../../src/stages/extract_data.py
-      md5: af85a63b034fc21a6c341f47dd81aab8
-      size: 1659
+      md5: 894879bae91fe624137b31cb2d7fafed
+      size: 1653
     params:
       params.yaml:
         base:
@@ -73,20 +81,12 @@ stages:
           - holiday
           - workingday
         train:
-          n_estimators: 50
+          n_estimators: 10
           model_path: models/model.joblib
     outs:
     - path: ../../models/model.joblib
-      md5: 9ce11616eb4020d4f065a590db3b791a
-      size: 2297569
-  load_data:
-    cmd: "echo \"Download Bike Sharing data...\"\nwget https://archive.ics.uci.edu/ml/machine-learning-databases/00275/Bike-Sharing-Dataset.zip\
-      \ -P ../../data/\necho \"Unzip data...\"\nunzip ../../data/Bike-Sharing-Dataset.zip\
-      \ -d ../../data/\n"
-    outs:
-    - path: ../../data/hour.csv
-      md5: 7cc28fc0c06420915e18b954811c342c
-      size: 1156736
+      md5: 40eb7e5c7ef5b65c6d14ddedeb3abc36
+      size: 463457
   evaluate:
     cmd: python ../../src/stages/evaluate.py --config=params.yaml
     deps:
@@ -97,11 +97,11 @@ stages:
       md5: ff6463a6dd33b07bb405b6c272dc4fda
       size: 38764
     - path: ../../models/model.joblib
-      md5: 9ce11616eb4020d4f065a590db3b791a
-      size: 2297569
+      md5: 40eb7e5c7ef5b65c6d14ddedeb3abc36
+      size: 463457
     - path: ../../src/stages/evaluate.py
-      md5: cbda23f1f2d535f2f9b2185b808a16ea
-      size: 3373
+      md5: 1da459ea8d8fb1fd366ea3a275130f13
+      size: 4439
     params:
       params.yaml:
         base:
@@ -127,11 +127,15 @@ stages:
         monitoring:
           reports_dir: reports/train
           model_performance_path: model_performance.html
+          metrics_path: metrics.json
           reference_data: data/reference_data.csv
     outs:
     - path: ../../data/reference_data.csv
-      md5: caf000af4a122e9f534ea3aa9ed25fc8
-      size: 12748
+      md5: 15b8ad0bfffb14156375f28d1a8cd0e8
+      size: 12653
+    - path: ../../reports/train/metrics.json
+      md5: 1a94867147af9783ca36f6c45fb3a99a
+      size: 175
     - path: ../../reports/train/model_performance.html
-      md5: 2a084f1e01e394dfebc15192f92683f9
-      size: 3328943
+      md5: 5a1fc611f6564600cf771e06687fd37f
+      size: 3318055

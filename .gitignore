@@ -1,8 +1,10 @@
 # Project
 data/
 notebooks/
+!reports/train/*
 reports/
 
+sage
 # Caches
 __pycache__
 .ipynb_checkpoints

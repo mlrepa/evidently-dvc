@@ -62,7 +62,9 @@ def monitoring(config_path: Text) -> None:
     logging.info("Create a model performance report...")
     model_performance_report = Report(metrics=[RegressionPreset()])
     model_performance_report.run(
-        reference_data=reference, current_data=current, column_mapping=column_mapping
+        reference_data=reference, 
+        current_data=current, 
+        column_mapping=column_mapping
     )
     model_performance_report_path = (
         reports_dir / config["monitoring"]["model_performance_path"]
