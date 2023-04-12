@@ -50,3 +50,6 @@ stages:
     outs:
       - ${base.workdir}/${monitoring.reports_dir}/${monitoring.model_performance_path}
       - ${base.workdir}/${monitoring.reference_data}
+    metrics:
+      - ${base.workdir}/${monitoring.reports_dir}/${monitoring.metrics_path}:
+          cache: false

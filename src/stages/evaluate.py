@@ -1,5 +1,6 @@
 import argparse
 import logging
+import numpy as np
 from pathlib import Path
 from typing import Dict, List, Text
 
@@ -9,6 +10,26 @@ import yaml
 from evidently import ColumnMapping
 from evidently.metric_preset import RegressionPreset
 from evidently.report import Report
+
+def numpy_to_standard_types(input_data: Dict) -> Dict:
+    """Convert numpy type values to standard Python types in flat(!) dictionary.
+
+    Args:
+        input_data (Dict): Input data (flat dictionary).
+
+    Returns:
+        Dict: Dictionary with standard value types.
+    """
+
+    output_data: Dict = {}
+
+    for k, v in input_data.items():
+        if isinstance(v, np.generic):
+            v = v.item()
+        output_data[k] = v
+
+    return output_data
+
 
 
 def evaluate(config_path: Text) -> None:
@@ -85,6 +106,19 @@ def evaluate(config_path: Text) -> None:
     model_performance_report_path = reports_dir / "model_performance.html"
     model_performance_report.save_html(model_performance_report_path)
     logging.info(f"Regression report saved to {model_performance_report_path}")
+    
+    # Save evaluation metrics
+    quality_metric: Dict = model_performance_report.as_dict()['metrics'][0]
+    raw_quality_metric_result: Dict = quality_metric['result']
+    quality_metric_result: Dict = {
+        k: v
+        for k, v in raw_quality_metric_result.items()
+        if k in ['r2_score', 'rmse', 'mean_error', 'mean_abs_error', 'mean_abs_perc_error']
+    }
+    logging.info(f"Quality metrics: {quality_metric_result}")
+    metrics_path = reports_dir / "metrics.json"
+    with open(metrics_path, "w") as f:
+        f.write(str(quality_metric_result))
 
     # Save reference data
     ref_data_path = workdir / config["monitoring"]["reference_data"]
