@@ -18,7 +18,7 @@ extract_data:
   test_dates_range: '2011-01-29--2011-02-28'
 
 train:
-  n_estimators: 50
+  n_estimators: 10
   model_path: models/model.joblib
 
 monitoring:

@@ -118,7 +118,7 @@ def evaluate(config_path: Text) -> None:
     logging.info(f"Quality metrics: {quality_metric_result}")
     metrics_path = reports_dir / "metrics.json"
     with open(metrics_path, "w") as f:
-        f.write(str(quality_metric_result))
+        f.write(str(quality_metric_result).replace("\'", "\""))
 
     # Save reference data
     ref_data_path = workdir / config["monitoring"]["reference_data"]
