@@ -1,7 +1,7 @@
 # Project
 data/
 notebooks/
-!reports/train/*
+!reports/train/metrics.json
 reports/
 
 sage
