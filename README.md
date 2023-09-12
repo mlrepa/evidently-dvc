@@ -12,13 +12,6 @@ pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
 ```
 
-Set up Jupyter Notebook
-```bash
-python -m ipykernel install --user --name=evidently
-jupyter contrib nbextension install --user
-jupyter nbextension enable toc2/main
-```
-
 ## Run pipelines
 
 ### `train`
