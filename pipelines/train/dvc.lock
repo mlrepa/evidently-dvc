@@ -81,12 +81,13 @@ stages:
           - holiday
           - workingday
         train:
-          n_estimators: 10
+          n_estimators: 30
           model_path: models/model.joblib
     outs:
     - path: ../../models/model.joblib
-      md5: 40eb7e5c7ef5b65c6d14ddedeb3abc36
-      size: 463457
+      hash: md5
+      md5: ac81ffa31b2d086adc495f1505f8d07e
+      size: 1385761
   evaluate:
     cmd: python ../../src/stages/evaluate.py --config=params.yaml
     deps:
@@ -97,8 +98,9 @@ stages:
       md5: ff6463a6dd33b07bb405b6c272dc4fda
       size: 38764
     - path: ../../models/model.joblib
-      md5: 40eb7e5c7ef5b65c6d14ddedeb3abc36
-      size: 463457
+      hash: md5
+      md5: ac81ffa31b2d086adc495f1505f8d07e
+      size: 1385761
     - path: ../../src/stages/evaluate.py
       md5: 1da459ea8d8fb1fd366ea3a275130f13
       size: 4439
@@ -131,11 +133,14 @@ stages:
           reference_data: data/reference_data.csv
     outs:
     - path: ../../data/reference_data.csv
-      md5: 15b8ad0bfffb14156375f28d1a8cd0e8
-      size: 12653
+      hash: md5
+      md5: cb4ff30557441473db486d1d4562c68d
+      size: 14328
     - path: ../../reports/train/metrics.json
-      md5: 1a94867147af9783ca36f6c45fb3a99a
+      hash: md5
+      md5: b37caea01c945dd8a89a8c0ae70bb795
       size: 175
     - path: ../../reports/train/model_performance.html
-      md5: 5a1fc611f6564600cf771e06687fd37f
-      size: 3318055
+      hash: md5
+      md5: 25cda263ac74f27ec888d9af7602d237
+      size: 3419950
