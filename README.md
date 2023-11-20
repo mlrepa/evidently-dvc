@@ -1,4 +1,4 @@
-# Tutorial: Build Data validation and Model Monitoring pipelines with DVC and EvidentlyAI
+# Tutorial: Build Data validation and Model Monitoring pipelines with DVC and Evidently
 ![DVC + Evidently](static/preview.png "preview")
 
 ## Create virtual environment
