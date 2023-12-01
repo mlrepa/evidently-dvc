@@ -1,55 +1,46 @@
-
 stages:
 
-  load_data: 
+  load_data:
     cmd: |
       echo "Download Bike Sharing data..."
       wget https://archive.ics.uci.edu/ml/machine-learning-databases/00275/Bike-Sharing-Dataset.zip -P ${base.workdir}/data/
       echo "Unzip data..."
       unzip ${base.workdir}/data/Bike-Sharing-Dataset.zip -d ${base.workdir}/data/
-    outs: 
-      - ${base.workdir}/${data.raw_data}:
-          cache: false
-  
+    outs:
+    - ${base.workdir}/${data.raw_data}:
+        cache: false
+
   extract_data:
     cmd: python ${base.workdir}/src/stages/extract_data.py --config=params.yaml
     params:
-      - base
-      - data
-      - extract_data
+    - extract_data
     deps:
-      - ${base.workdir}/src/stages/extract_data.py
-      - ${base.workdir}/${data.raw_data}
+    - ${base.workdir}/src/stages/extract_data.py
+    - ${base.workdir}/${data.raw_data}
     outs:
-      - ${base.workdir}/${data.train_data}
-      - ${base.workdir}/${data.test_data}
+    - ${base.workdir}/${data.train_data}
+    - ${base.workdir}/${data.test_data}
 
   train:
     cmd: python ${base.workdir}/src/stages/train.py --config=params.yaml
     params:
-      - base
-      - data
-      - train
+    - train
     deps:
-      - ${base.workdir}/src/stages/train.py
-      - ${base.workdir}/${data.train_data}
+    - ${base.workdir}/src/stages/train.py
+    - ${base.workdir}/${data.train_data}
     outs:
-      - ${base.workdir}/${train.model_path}
+    - ${base.workdir}/${train.model_path}
 
   evaluate:
     cmd: python ${base.workdir}/src/stages/evaluate.py --config=params.yaml
     params:
-      - base
-      - data
-      - monitoring
+    - evaluate
     deps:
-      - ${base.workdir}/src/stages/evaluate.py
-      - ${base.workdir}/${data.test_data}
-      - ${base.workdir}/${data.train_data}
-      - ${base.workdir}/${train.model_path}
+    - ${base.workdir}/src/stages/evaluate.py
+    - ${base.workdir}/${data.test_data}
+    - ${base.workdir}/${data.train_data}
+    - ${base.workdir}/${train.model_path}
     outs:
-      - ${base.workdir}/${monitoring.reports_dir}/${monitoring.model_performance_path}
-      - ${base.workdir}/${monitoring.reference_data}
-    metrics:
-      - ${base.workdir}/${monitoring.reports_dir}/${monitoring.metrics_path}:
-          cache: false
+    - ${base.workdir}/${evaluate.reference_data}
+metrics:
+- ../../reports/train/metrics.json

@@ -4,11 +4,18 @@ import numpy as np
 from pathlib import Path
 from typing import Dict, List, Text
 
+from dvclive import Live
 import joblib
 import pandas as pd
 import yaml
 from evidently import ColumnMapping
-from evidently.metric_preset import RegressionPreset
+from evidently.metrics import (      
+    RegressionQualityMetric,
+    RegressionPredictedVsActualScatter,
+    RegressionErrorNormality,
+    RegressionTopErrorMetric,
+    RegressionDummyMetric,
+)
 from evidently.report import Report
 
 def numpy_to_standard_types(input_data: Dict) -> Dict:
@@ -46,9 +53,9 @@ def evaluate(config_path: Text) -> None:
         level=config["base"]["logging_level"], format="TRAIN: %(message)s"
     )
 
-    workdir: Path = Path(config["base"]["workdir"])
-    reports_dir: Path = workdir / config["monitoring"]["reports_dir"]
-    reports_dir.mkdir(exist_ok=True)
+    WORKDIR: Path = Path(config["base"]["workdir"])
+    REPORTS_DIR: Path = WORKDIR / config["base"]["reports_dir"]
+    REPORTS_DIR.mkdir(exist_ok=True)
 
     numerical_features: List[Text] = config["data"]["numerical_features"]
     categorical_features: List[Text] = config["data"]["categorical_features"]
@@ -56,13 +63,13 @@ def evaluate(config_path: Text) -> None:
     prediction_col: Text = config["data"]["prediction_col"]
 
     logging.info("Load data")
-    train_data_path: Path = workdir / config["data"]["train_data"]
-    test_data_path: Path = workdir / config["data"]["test_data"]
+    train_data_path: Path = WORKDIR / config["data"]["train_data"]
+    test_data_path: Path = WORKDIR / config["data"]["test_data"]
     train_data: pd.DataFrame = pd.read_csv(train_data_path, index_col="dteday")
     test_data: pd.DataFrame = pd.read_csv(test_data_path, index_col="dteday")
 
     logging.info("Load model")
-    model_path: Path = workdir / config["train"]["model_path"]
+    model_path: Path = WORKDIR / config["train"]["model_path"]
     model = joblib.load(model_path)
 
     logging.info("Get predictions to TEST data")
@@ -84,44 +91,51 @@ def evaluate(config_path: Text) -> None:
     column_mapping.prediction = prediction_col
     column_mapping.numerical_features = numerical_features
     column_mapping.categorical_features = categorical_features
-    logging.debug(f"Column mapping: {column_mapping}")
 
-    logging.info("Build Evidently report: Regression Model Report (on train)")
-
-    # Create a model performance report
+    logging.info("Create a model performance report")
     model_performance_report = Report(
         metrics=[
-            RegressionPreset(),
+            RegressionQualityMetric(),
+            RegressionPredictedVsActualScatter(),
+            RegressionErrorNormality(),
+            RegressionTopErrorMetric(),
+            RegressionDummyMetric(),
         ]
     )
 
-    # Calculate metrics
+    logging.info("Calculate metrics")
     model_performance_report.run(
         reference_data=reference_data,
         current_data=test_data,
         column_mapping=column_mapping,
     )
-
-    # Save reports in HTML format
-    model_performance_report_path = reports_dir / "model_performance.html"
-    model_performance_report.save_html(model_performance_report_path)
-    logging.info(f"Regression report saved to {model_performance_report_path}")
     
-    # Save evaluation metrics
-    quality_metric: Dict = model_performance_report.as_dict()['metrics'][0]
-    raw_quality_metric_result: Dict = quality_metric['result']
-    quality_metric_result: Dict = {
-        k: v
-        for k, v in raw_quality_metric_result.items()
-        if k in ['r2_score', 'rmse', 'mean_error', 'mean_abs_error', 'mean_abs_perc_error']
-    }
-    logging.info(f"Quality metrics: {quality_metric_result}")
-    metrics_path = reports_dir / "metrics.json"
-    with open(metrics_path, "w") as f:
-        f.write(str(quality_metric_result).replace("\'", "\""))
+    logging.info("Extract metrics")
+    regression_metrics: Dict = model_performance_report.as_dict()['metrics'][0]['result']["current"]
+    metric_names = ['r2_score', 'rmse', 'mean_error', 'mean_abs_error', 'mean_abs_perc_error']
+    selected_metrics = {k: regression_metrics.get(k) for k in metric_names} 
+    
+    logging.info("Save evaluation metrics and model report")
+    with Live(dir=REPORTS_DIR, 
+              save_dvc_exp=False, 
+              dvcyaml="dvc.yaml",) as live:
 
-    # Save reference data
-    ref_data_path = workdir / config["monitoring"]["reference_data"]
+        # Log metrics 
+        [live.log_metric(k, v, plot=False) for k,v in selected_metrics.items()]
+
+        # Save reports in HTML format
+        model_performance_report_path = REPORTS_DIR / "model_performance.html"
+        model_performance_report.save_html(str(model_performance_report_path))
+        # live.log_artifact(
+        #     model_performance_report_path,
+        #     name="model_performance_report",
+        #     desc="Model performance report",
+        #     labels=["train", "model_performance"],
+        #     cache=False
+        # )
+
+    logging.info("Save reference data")
+    ref_data_path = WORKDIR / config["evaluate"]["reference_data"]
     reference_data.to_csv(ref_data_path)
     logging.info(f"Saved reference data to to {ref_data_path}")
 

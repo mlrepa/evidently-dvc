@@ -6,8 +6,8 @@
 Create virtual environment named `.venv` and install python libraries
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate
 echo "export PYTHONPATH=$PWD" >> .venv/bin/activate
+source .venv/bin/activate
 pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
 ```

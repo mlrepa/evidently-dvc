@@ -1,6 +1,7 @@
 base:
   # workdir: .
   workdir: ../..
+  reports_dir: reports/train
   logging_level: INFO
 
 data:
@@ -21,8 +22,7 @@ train:
   n_estimators: 30
   model_path: models/model.joblib
 
-monitoring:
-  reports_dir: reports/train
+evaluate:
   model_performance_path: model_performance.html
   metrics_path: metrics.json
 
