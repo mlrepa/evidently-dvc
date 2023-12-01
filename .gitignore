@@ -3,6 +3,7 @@ data/
 notebooks/
 !reports/train
 reports/
+models/
 
 # Caches
 __pycache__
