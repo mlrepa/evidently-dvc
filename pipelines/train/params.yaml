@@ -1,5 +1,4 @@
 base:
-  # workdir: .
   workdir: ../..
   reports_dir: reports/train
   logging_level: INFO
@@ -8,6 +7,7 @@ data:
   raw_data: data/hour.csv
   train_data: data/train.csv
   test_data: data/test.csv
+  reference_data: data/reference_data.csv
   
   target_col: cnt
   prediction_col: prediction
@@ -25,8 +25,5 @@ train:
 evaluate:
   model_performance_path: model_performance.html
   metrics_path: metrics.json
-
-  # Reference data and predictions for monitoring 
-  reference_data: data/reference_data.csv
 
   

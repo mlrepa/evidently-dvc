@@ -114,16 +114,15 @@ stages:
       size: 1385761
     - path: ../../src/stages/evaluate.py
       hash: md5
-      md5: a59e8d77bcb6effc1ee7746165afc7ce
-      size: 4883
+      md5: 863b615a485a0f7788e67d148bb26726
+      size: 4620
     params:
       params.yaml:
         evaluate:
           model_performance_path: model_performance.html
           metrics_path: metrics.json
-          reference_data: data/reference_data.csv
     outs:
     - path: ../../data/reference_data.csv
       hash: md5
-      md5: 779408bd8e4db40b403d2e88943d4678
-      size: 14311
+      md5: 0d922c2760b85da2e1735cb1e7673813
+      size: 14206

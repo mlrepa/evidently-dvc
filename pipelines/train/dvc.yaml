@@ -41,6 +41,6 @@ stages:
     - ${base.workdir}/${data.train_data}
     - ${base.workdir}/${train.model_path}
     outs:
-    - ${base.workdir}/${evaluate.reference_data}
+    - ${base.workdir}/${data.reference_data}
 metrics:
 - ../../reports/train/metrics.json

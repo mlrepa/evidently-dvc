@@ -126,16 +126,9 @@ def evaluate(config_path: Text) -> None:
         # Save reports in HTML format
         model_performance_report_path = REPORTS_DIR / "model_performance.html"
         model_performance_report.save_html(str(model_performance_report_path))
-        # live.log_artifact(
-        #     model_performance_report_path,
-        #     name="model_performance_report",
-        #     desc="Model performance report",
-        #     labels=["train", "model_performance"],
-        #     cache=False
-        # )
 
     logging.info("Save reference data")
-    ref_data_path = WORKDIR / config["evaluate"]["reference_data"]
+    ref_data_path = WORKDIR / config["data"]["reference_data"]
     reference_data.to_csv(ref_data_path)
     logging.info(f"Saved reference data to to {ref_data_path}")
 
