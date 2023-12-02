@@ -1,23 +1,17 @@
 stages:
   
   predict:
-    cmd: python ${base.workdir}/src/stages/predict.py --config=params.yaml
+    vars:
+      - PIPELINE_DIR: pipelines/predict
+    cmd: python src/stages/predict.py --config=${PIPELINE_DIR}/params.yaml
+    # cmd: python ${base.workdir}/src/stages/predict.py --config=params.yaml
+    wdir: ../..
     params:
-      - base
-      - predict
+      - ${PIPELINE_DIR}/params.yaml:
+        - base
+        - predict
     deps:
-      - ${base.workdir}/src/stages/predict.py
-      - ${base.workdir}/${predict.model_path}
+      - src/stages/predict.py
+      - ${predict.model_path}
     outs:
-      - ${base.workdir}/${predict.predictions_dir}/${predict.week_start}--${predict.week_end}.csv
-
-  monitoring:
-    cmd: python ${base.workdir}/src/stages/monitor_data.py --config=params.yaml
-    params:
-      - base
-      - predict
-    deps:
-      - ${base.workdir}/${predict.predictions_dir}/${predict.week_start}--${predict.week_end}.csv
-    outs:
-      - ${base.workdir}/${monitoring.reports_dir}/${predict.week_start}--${predict.week_end}/${monitoring.data_drift_path}
-      - ${base.workdir}/${monitoring.reports_dir}/${predict.week_start}--${predict.week_end}/${monitoring.data_quality_path}
+      - ${predict.predictions_dir}/${predict.week_start}--${predict.week_end}.csv

@@ -25,9 +25,13 @@ def predict(config_path: Text) -> None:
     WEEK_END = config["predict"]["week_end"]
     logging.info(f"Predict for period: {WEEK_START} - {WEEK_END}")
 
-    workdir: Path = Path(config["base"]["workdir"])
-    predictions_dir: Path = workdir / config["predict"]["predictions_dir"]
+    # workdir: Path = Path(config["base"]["workdir"])
+    predictions_dir: Path = Path(config["predict"]["predictions_dir"])
     predictions_dir.mkdir(exist_ok=True)
+    
+    # workdir: Path = Path(config["base"]["workdir"])
+    # predictions_dir: Path = workdir / config["predict"]["predictions_dir"]
+    # predictions_dir.mkdir(exist_ok=True)
 
     logging.info("Load metadata")
     numerical_features: List[Text] = config["data"]["numerical_features"]
@@ -35,12 +39,14 @@ def predict(config_path: Text) -> None:
     prediction_col: Text = config["data"]["prediction_col"]
 
     logging.info("Load data")
-    predict_data_path: Path = workdir / config["data"]["predict_data"]
+    predict_data_path: Path = config["data"]["predict_data"]
+    # predict_data_path: Path = workdir / config["data"]["predict_data"]
     predict_data: pd.DataFrame = pd.read_csv(predict_data_path, index_col="dteday")
     predict_data = predict_data[WEEK_START:WEEK_END]
 
     logging.info("Load model")
-    model_path: Path = workdir / config["predict"]["model_path"]
+    model_path: Path = config["predict"]["model_path"]
+    # model_path: Path = workdir / config["predict"]["model_path"]
     model = joblib.load(model_path)
     logging.info(model)
 

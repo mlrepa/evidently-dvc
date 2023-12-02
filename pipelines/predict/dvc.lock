@@ -1,20 +1,19 @@
 schema: '2.0'
 stages:
   predict:
-    cmd: python ../../src/stages/predict.py --config=params.yaml
+    cmd: python src/stages/predict.py --config=pipelines/predict/params.yaml
     deps:
-    - path: ../../models/model.joblib
+    - path: models/model.joblib
       hash: md5
-      md5: 40eb7e5c7ef5b65c6d14ddedeb3abc36
-      size: 463457
-    - path: ../../src/stages/predict.py
+      md5: 7efa85b2cd09eddb480a5e38823761db
+      size: 1557905
+    - path: src/stages/predict.py
       hash: md5
-      md5: a6f8a39f621a51f3b4a955a27abc5a92
-      size: 2061
+      md5: 66d5ec3f9f9e67f5ab2d10e8e183ba8b
+      size: 2358
     params:
-      params.yaml:
+      pipelines/predict/params.yaml:
         base:
-          workdir: ../..
           logging_level: INFO
         predict:
           model_path: models/model.joblib
@@ -22,17 +21,17 @@ stages:
           week_end: '2011-02-04'
           predictions_dir: data/predictions
     outs:
-    - path: ../../data/predictions/2011-01-29--2011-02-04.csv
+    - path: data/predictions/2011-01-29--2011-02-04.csv
       hash: md5
-      md5: e7d9fd5f0802bc5cd29267e399cfdd40
-      size: 11122
+      md5: 212c8b75d40dfed6f3353a16ff131c3b
+      size: 12464
   monitoring:
     cmd: python ../../src/stages/monitor_data.py --config=params.yaml
     deps:
     - path: ../../data/predictions/2011-01-29--2011-02-04.csv
       hash: md5
-      md5: e7d9fd5f0802bc5cd29267e399cfdd40
-      size: 11122
+      md5: 212c8b75d40dfed6f3353a16ff131c3b
+      size: 12464
     params:
       params.yaml:
         base:
@@ -46,9 +45,9 @@ stages:
     outs:
     - path: ../../reports/2011-01-29--2011-02-04/data_drift.html
       hash: md5
-      md5: 85f4544ab8204af62da36cfd9d0c45e3
-      size: 2866810
+      md5: d8cac7dc68e07b1009f9fb4650542ba3
+      size: 3685953
     - path: ../../reports/2011-01-29--2011-02-04/data_quality.html
       hash: md5
-      md5: 57400a392d3cc447bd7e1021905b6b74
-      size: 2852990
+      md5: 875acf564fe711040a0fc8b902fdbf63
+      size: 3447848

@@ -9,18 +9,12 @@ import joblib
 import pandas as pd
 import yaml
 from evidently import ColumnMapping
-from evidently.metrics import (      
-    RegressionQualityMetric,
-    RegressionPredictedVsActualScatter,
-    RegressionErrorNormality,
-    RegressionTopErrorMetric,
-    RegressionDummyMetric,
-)
+from evidently.metric_preset import RegressionPreset
 from evidently.report import Report
 
 
 
-def evaluate(config_path: Text) -> None:
+def evaluate(config_path: Text, pdir: Text) -> None:
     """Train model.
 
     Args:
@@ -31,11 +25,11 @@ def evaluate(config_path: Text) -> None:
         config: Dict = yaml.safe_load(config_f)
 
     logging.basicConfig(
-        level=config["base"]["logging_level"], format="TRAIN: %(message)s"
+        level=config["base"]["logging_level"], 
+        format="TRAIN: %(message)s"
     )
 
-    WORKDIR: Path = Path(config["base"]["workdir"])
-    REPORTS_DIR: Path = WORKDIR / config["base"]["reports_dir"]
+    REPORTS_DIR: Path = Path(config["base"]["reports_dir"])
     REPORTS_DIR.mkdir(exist_ok=True)
 
     numerical_features: List[Text] = config["data"]["numerical_features"]
@@ -44,13 +38,13 @@ def evaluate(config_path: Text) -> None:
     prediction_col: Text = config["data"]["prediction_col"]
 
     logging.info("Load data")
-    train_data_path: Path = WORKDIR / config["data"]["train_data"]
-    test_data_path: Path = WORKDIR / config["data"]["test_data"]
-    train_data: pd.DataFrame = pd.read_csv(train_data_path, index_col="dteday")
-    test_data: pd.DataFrame = pd.read_csv(test_data_path, index_col="dteday")
+    train_data_path: Path = Path(config["data"]["train_data"])
+    test_data_path: Path = Path(config["data"]["test_data"])
+    train_data: pd.DataFrame = pd.read_csv(train_data_path, index_col="dteday").reset_index(drop=True)
+    test_data: pd.DataFrame = pd.read_csv(test_data_path, index_col="dteday").reset_index(drop=True)
 
     logging.info("Load model")
-    model_path: Path = WORKDIR / config["train"]["model_path"]
+    model_path: Path = Path(config["train"]["model_path"])
     model = joblib.load(model_path)
 
     logging.info("Get predictions to TEST data")
@@ -61,7 +55,7 @@ def evaluate(config_path: Text) -> None:
         test_data[numerical_features + categorical_features]
     )
 
-    logging.info("Prepare datasets for monitoring)")
+    logging.info("Prepare datasets for monitoring")
     test_data["prediction"] = test_prediction
     train_data["prediction"] = train_prediction
     reference_data = train_data.sample(frac=0.3)
@@ -74,17 +68,7 @@ def evaluate(config_path: Text) -> None:
     column_mapping.categorical_features = categorical_features
 
     logging.info("Create a model performance report")
-    model_performance_report = Report(
-        metrics=[
-            RegressionQualityMetric(),
-            RegressionPredictedVsActualScatter(),
-            RegressionErrorNormality(),
-            RegressionTopErrorMetric(),
-            RegressionDummyMetric(),
-        ]
-    )
-
-    logging.info("Calculate metrics")
+    model_performance_report = Report(metrics=[RegressionPreset()])
     model_performance_report.run(
         reference_data=reference_data,
         current_data=test_data,
@@ -92,6 +76,7 @@ def evaluate(config_path: Text) -> None:
     )
     
     logging.info("Extract metrics")
+    print(model_performance_report.as_dict())
     regression_metrics: Dict = model_performance_report.as_dict()['metrics'][0]['result']["current"]
     metric_names = ['r2_score', 'rmse', 'mean_error', 'mean_abs_error', 'mean_abs_perc_error']
     selected_metrics = {k: regression_metrics.get(k) for k in metric_names} 
@@ -99,7 +84,7 @@ def evaluate(config_path: Text) -> None:
     logging.info("Save evaluation metrics and model report")
     with Live(dir=REPORTS_DIR, 
               save_dvc_exp=False, 
-              dvcyaml="dvc.yaml",) as live:
+              dvcyaml=f"{pdir}/dvc.yaml",) as live:
 
         # Log metrics 
         [live.log_metric(k, v, plot=False) for k,v in selected_metrics.items()]
@@ -107,9 +92,9 @@ def evaluate(config_path: Text) -> None:
         # Save reports in HTML format
         model_performance_report_path = REPORTS_DIR / "model_performance.html"
         model_performance_report.save_html(str(model_performance_report_path))
-
+ 
     logging.info("Save reference data")
-    ref_data_path = WORKDIR / config["data"]["reference_data"]
+    ref_data_path = Path(config["data"]["reference_data"])
     reference_data.to_csv(ref_data_path)
     logging.info(f"Saved reference data to to {ref_data_path}")
 
@@ -117,6 +102,7 @@ def evaluate(config_path: Text) -> None:
 if __name__ == "__main__":
     args_parser = argparse.ArgumentParser()
     args_parser.add_argument("--config", dest="config", required=True)
+    args_parser.add_argument("--pdir", dest="pdir", required=True)
     args = args_parser.parse_args()
 
-    evaluate(config_path=args.config)
+    evaluate(config_path=args.config, pdir=args.pdir)

@@ -20,10 +20,9 @@ def extract_data(config_path: Text) -> None:
     logging.basicConfig(
         level=config["base"]["logging_level"], format="EXTRACT_DATA: %(message)s"
     )
-    workdir: Path = Path(config["base"]["workdir"])
 
     logging.info("Load raw data")
-    raw_data_path: Dict = workdir / config["data"]["raw_data"]
+    raw_data_path: Dict = Path(config["data"]["raw_data"])
     raw_data: pd.DataFrame = pd.read_csv(
         raw_data_path, header=0, sep=",", parse_dates=["dteday"], index_col="dteday"
     )
@@ -40,8 +39,8 @@ def extract_data(config_path: Text) -> None:
     print(type(train_data))
 
     logging.info("Save train_data and test_data data")
-    train_data.to_csv(workdir / config["data"]["train_data"])
-    test_data.to_csv(workdir / config["data"]["test_data"])
+    train_data.to_csv(config["data"]["train_data"])
+    test_data.to_csv(config["data"]["test_data"])
 
 
 if __name__ == "__main__":

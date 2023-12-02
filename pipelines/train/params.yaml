@@ -1,5 +1,4 @@
 base:
-  workdir: ../..
   reports_dir: reports/train
   logging_level: INFO
 

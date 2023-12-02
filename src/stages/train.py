@@ -23,13 +23,12 @@ def train(config_path: Text) -> None:
         level=config["base"]["logging_level"], format="TRAIN: %(message)s"
     )
 
-    workdir: Path = Path(config["base"]["workdir"])
     numerical_features: List[Text] = config["data"]["numerical_features"]
     categorical_features: List[Text] = config["data"]["categorical_features"]
     target_col: Text = config["data"]["target_col"]
 
     logging.info("Load train data")
-    train_data_path: Path = workdir / config["data"]["train_data"]
+    train_data_path: Path = Path(config["data"]["train_data"])
     train_data: pd.DataFrame = pd.read_csv(train_data_path, index_col="dteday")
 
     logging.info("Train model")
@@ -43,7 +42,7 @@ def train(config_path: Text) -> None:
     )
 
     logging.info("Save the model")
-    model_path: Path = workdir / config["train"]["model_path"]
+    model_path: Path = Path(config["train"]["model_path"])
     joblib.dump(regressor, model_path)
     logging.info(f"Model saved to: {model_path}")
 

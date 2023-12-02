@@ -1,13 +1,33 @@
 
+vars:
+  - PIPELINE_DIR: pipelines/monitor
+
 stages:
 
-  monitoring:
-    cmd: python ${base.workdir}/src/stages/monitor_model.py --config=params.yaml
+  monitor_data:
+    cmd: python src/stages/monitor_data.py --config=${PIPELINE_DIR}/params.yaml
+    wdir: ../..
     params:
-      - base
-      - predict
+      - ${PIPELINE_DIR}/params.yaml:
+          - predict
+          - monitoring
     deps:
-      - ${base.workdir}/${predict.predictions_dir}/${predict.week_start}--${predict.week_end}.csv
+      - src/stages/monitor_data.py
+      - ${predict.predictions_dir}/${predict.week_start}--${predict.week_end}.csv
     outs:
-      - ${base.workdir}/${monitoring.reports_dir}/${predict.week_start}--${predict.week_end}/${monitoring.target_drift_path}
-      - ${base.workdir}/${monitoring.reports_dir}/${predict.week_start}--${predict.week_end}/${monitoring.model_performance_path}
+      - ${monitoring.reports_dir}/${predict.week_start}--${predict.week_end}/${monitoring.data_drift_path}
+      - ${monitoring.reports_dir}/${predict.week_start}--${predict.week_end}/${monitoring.data_quality_path}
+
+  monitor_model:
+    cmd: python src/stages/monitor_model.py --config=${PIPELINE_DIR}/params.yaml
+    wdir: ../..
+    params:
+      - ${PIPELINE_DIR}/params.yaml:
+          - predict
+          - monitoring
+    deps:
+      - src/stages/monitor_model.py
+      - ${predict.predictions_dir}/${predict.week_start}--${predict.week_end}.csv
+    outs:
+      - ${monitoring.reports_dir}/${predict.week_start}--${predict.week_end}/${monitoring.target_drift_path}
+      - ${monitoring.reports_dir}/${predict.week_start}--${predict.week_end}/${monitoring.model_performance_path}

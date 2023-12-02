@@ -1,5 +1,4 @@
 base:
-  workdir: ../..
   logging_level: INFO
 
 data:
@@ -21,3 +20,7 @@ monitoring:
 
   model_performance_path: model_performance.html
   target_drift_path: target_drift.html
+
+  # predictions_drift_path: predictions_drift.html
+  data_drift_path: data_drift.html
+  data_quality_path: data_quality.html

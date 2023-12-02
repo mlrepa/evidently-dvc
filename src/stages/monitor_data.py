@@ -20,6 +20,7 @@ def monitoring(config_path: Text) -> None:
 
     with open(config_path) as config_f:
         config: Dict = yaml.safe_load(config_f)
+        print(config)
 
     logging.basicConfig(
         level=config["base"]["logging_level"], format="MONITORING: %(message)s"
@@ -29,37 +30,32 @@ def monitoring(config_path: Text) -> None:
     WEEK_END = config["predict"]["week_end"]
     logging.info(f"Predict for period: {WEEK_START} - {WEEK_END}")
 
-    workdir: Path = Path(config["base"]["workdir"])
-    predictions_dir: Path = workdir / config["predict"]["predictions_dir"]
-    reports_dir: Path = (
-        workdir / config["monitoring"]["reports_dir"] / f"{WEEK_START}--{WEEK_END}"
-    )
-    reports_dir.mkdir(exist_ok=True)
-    logging.info(f"Predict for period: {WEEK_START} - {WEEK_END}")
+    PREDICTIONS_DIR: Path = Path(config["predict"]["predictions_dir"])
+    REPORTS_DIR: Path = Path(config["monitoring"]["reports_dir"]) / f"{WEEK_START}--{WEEK_END}"
+    REPORTS_DIR.mkdir(exist_ok=True)
 
-    logging.info("Load data")
-    reference_data_path: Path = workdir / config["monitoring"]["reference_data"]
-    reference: pd.DataFrame = pd.read_csv(reference_data_path, index_col="dteday")
-
-    current_data_path: Path = predictions_dir / f"{WEEK_START}--{WEEK_END}.csv"
+    # logging.info("Load data")
+    reference_data_path: Path = Path(config["monitoring"]["reference_data"])
+    reference: pd.DataFrame = pd.read_csv(reference_data_path, index_col="dteday").reset_index()
+    current_data_path: Path = PREDICTIONS_DIR / f"{WEEK_START}--{WEEK_END}.csv"
     current: pd.DataFrame = pd.read_csv(current_data_path, index_col="dteday")
-    current = current.loc[WEEK_START:WEEK_END]
+    current = current.loc[WEEK_START:WEEK_END].reset_index()
 
     logging.info("Prepare column_mapping object for Evidently reports")
-    numerical_features: List[Text] = config["data"]["numerical_features"]
     column_mapping = ColumnMapping()
-    column_mapping.numerical_features = numerical_features
-    print(f"column mapping: {column_mapping}")
+    column_mapping.numerical_features: List[Text]  = config["data"]["numerical_features"]
 
-    logging.info("Data quality report...")
-
+    logging.info("Build Data quality report...")
+    
     # Data Quality
     data_quality_report = Report(metrics=[DataQualityPreset()])
     data_quality_report.run(
-        reference_data=reference, current_data=current, column_mapping=column_mapping
+        reference_data=reference, 
+        current_data=current, 
+        column_mapping=column_mapping
     )
-    data_quality_path = reports_dir / config["monitoring"]["data_quality_path"]
-    data_quality_report.save_html(data_quality_path)
+    data_quality_path = REPORTS_DIR / config["monitoring"]["data_quality_path"]
+    data_quality_report.save_html(str(data_quality_path))
     logging.info(f"Data quality report saved to: {data_quality_path}")
 
     # Data Drift
@@ -67,8 +63,8 @@ def monitoring(config_path: Text) -> None:
     data_drift_report.run(
         reference_data=reference, current_data=current, column_mapping=column_mapping
     )
-    data_drift_path = reports_dir / config["monitoring"]["data_drift_path"]
-    data_drift_report.save_html(data_drift_path)
+    data_drift_path = REPORTS_DIR / config["monitoring"]["data_drift_path"]
+    data_drift_report.save_html(str(data_drift_path))
     logging.info(f"Data drift report saved to: {data_drift_path}")
 
 

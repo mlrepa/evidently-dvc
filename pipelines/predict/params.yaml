@@ -1,5 +1,4 @@
 base:
-  workdir: ../..
   logging_level: INFO
 
 data:
@@ -14,13 +13,4 @@ predict:
   week_start: '2011-01-29'
   week_end: '2011-02-04'
   predictions_dir: data/predictions
-
-monitoring:
-  reports_dir: reports
-  reference_data: data/reference_data.csv
-
-  predictions_drift_path: predictions_drift.html
-  data_drift_path: data_drift.html
-  data_quality_path: data_quality.html
-
   
